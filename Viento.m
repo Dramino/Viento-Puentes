@@ -4,7 +4,6 @@ classdef Viento
         rho=0;   %Densidad del viento
         v=0;     %Velocidad media del viento
         h=0;     %Altura a revisar
-        w=linspace (0 ,20 ,2000) ;  %frecuencias del viento
     end
     
     methods
@@ -17,14 +16,11 @@ classdef Viento
             H=[obj.h];
             xLu=100*(H/10)^0.3;
             xLw=xLu/12;
-            v=[obj.v];
-            %Definicion de variables
-            w = [obj.w];
-            sNu=zeros(1,length(w));
-            sNw=zeros(1,length(w));
+            V=[obj.v];
+ 
             %Función de densidad espectral
-            sNu= Au*xLu./(v *(1+1.5* Au.*w*(xLu/v )).^(5/3) );
-            sNw= Aw*xLw./(v *(1+1.5* Aw.*w*(xLw/v )).^(5/3) );
+            sNu=@(w) Au.*xLu./(V *(1+1.5* Au.*w*(xLu/V )).^(5/3) );
+            sNw=@(w) Aw.*xLw./(V *(1+1.5* Aw.*w*(xLw/V )).^(5/3) );
         end
     end
     
