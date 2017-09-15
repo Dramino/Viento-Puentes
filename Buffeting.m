@@ -65,6 +65,7 @@ dMatriz=zeros(1,169);
 		fiYi = puente.fiY(i);
         fiZi = puente.fiZ(i);
 		xj   = 0;
+		x0   = puente.L(i)
 		for j = 1: n
             t = cputime;
 			Dj   = puente.D(j);
@@ -74,14 +75,14 @@ dMatriz=zeros(1,169);
 			xj   = xj + L ;
 			fiYj = puente.fiY(j);
             fiZj = puente.fiZ(j);
-			Dx   = abs (xi - xj );
+						
             %Co-espectro
-            %CoU = @(w) exp (- cuY* ( w*Dx ) /(2 * pi * viento.v));
-            %CoW = @(w) exp (- cwY* ( w*Dx ) /(2 * pi * viento.v));
-			%j
-			%jy2= puente.fiY .* puente.fiY .* ( (((2* puente.Iu )/ puente.B) ^2 .* puente.D .* puente.cD .* puente.D .* puente.cD) .* coU.* sNu + ( puente.cL * puente.Iv ) ^2 .* coW.* sNw ) .* puente.L * puente.L ;
-            %jY = @(w) puente.fiY .* puente.fiY .* ( (((2* puente.Iu )/ puente.B) ^2* Di * Cdi * Dj * Cdj ) .* CoU(w).* sNu(w) + ( puente.cL * puente.Iv ) ^2 .* CoW(w).* sNw(w) ) * L * L ;
-			%jZ = @(w) jZ + puente.fiZ .* puente.fiZ .* ( (2* puente.cL* puente.Iu) ^2 .* CoU(w).* sNu(w) + (( puente.Iv^2*( Cdli +( Di * Cdi )/puente.B) *(Cdlj +( Dj * Cdj )/ puente.B)) .*CoW(w).* sNw(w) )) * L * L ;
+            CoU = @(w,Dx) exp (- cuY .* ( w.*Dx ) /(2 * pi * viento.v));
+			CoW = @(w,Dx) exp (- cwY .* ( w.*Dx ) /(2 * pi * viento.v));
+			Dx  = arrayfun(@(x abs(x-x0),puente.L);
+            
+			jY = @(w) puente.fiY .* puente.fiY .* ( (((2* puente.Iu )/ puente.B) ^2* Di * Cdi * Dj * Cdj ) .* CoU(w,Dx).* sNu(w) + ( puente.cL * puente.Iv ) ^2 .* CoW(w,Dx).* sNw(w) ) * L * L ;
+			jZ = @(w) jZ + puente.fiZ .* puente.fiZ .* ( (2* puente.cL* puente.Iu) ^2 .* CoU(w).* sNu(w) + (( puente.Iv^2*( Cdli +( Di * Cdi )/puente.B) *(Cdlj +( Dj * Cdj )/ puente.B)) .*CoW(w).* sNw(w) )) * L * L ;
             e = cputime-t;
         end
         e = cputime-t;
