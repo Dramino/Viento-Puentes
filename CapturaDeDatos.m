@@ -6,6 +6,7 @@ puente=Puente;
 viento=Viento;
 %Asigna los datos a cada objeto
 puente.L=datos(:,2);
+puente.x=datos(:,3);
 puente.Lv=[datos(1:13,2); datos(33:43,2)];
 puente.m=datos(:,5);
 puente.fiY=datos(:,6);
