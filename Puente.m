@@ -44,13 +44,13 @@ classdef Puente<handle
             intPhi2 = 0;
             %Datos del puente
             %integral sobre L
-            for i = 1 : n
-                intM1   = intM1 + [obj.fiY(i)]^2* [obj.m(i)]* [obj.L(i)] ;
-                intPhi1 = intPhi1+[obj.fiY(i)]^2*[obj.L(i)];
-                intPhi2 = intPhi2+([obj.fiX(i)]^2+[obj.fiZ(i)]^2)*[obj.L(i)];
-                intM2   = intM2 + ([obj.fiX(i)]^2+[obj.fiZ(i)]^2)*[obj.m(i)]* [obj.L(i)] ;
-            end
-            [obj.m1] = intM1/intPhi1;
+           
+            intM1   = integrarS([obj.fiY].^2.* [obj.m],[obj.L]) ;
+            intPhi1 = integrarS([obj.fiY].^2,[obj.L]);
+            intPhi2 = integrarS([obj.fiX].^2+[obj.fiZ].^2,[obj.L]);
+            intM2   = integrarS(([obj.fiX].^2+[obj.fiZ].^2).*[obj.m],[obj.L]);
+            
+			[obj.m1] = intM1/intPhi1;
             [obj.m2] = intM2/intPhi2;
         end
         

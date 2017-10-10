@@ -1,5 +1,6 @@
 clear all
 close all
+tiempo = cputime;
 CapturaDeDatos;
 puente.integrarFi;
 %Amortiguamiento aerodinámico
@@ -9,10 +10,11 @@ intFiY = 0;
 intZ   = 0;
 intFiZ = 0;
 
-intY   = sum(puente.fiY.^2.*puente.D.* puente.cD.*puente.L);
-intFiY = sum(puente.fiY.^2.*puente.L);
-intZ   = sum(puente.fiZ.^2.*puente.B.*puente.cdl + puente.D.*puente.cD.*puente.L);
-intFiZ = sum(puente.fiZ.^2.*puente.L);
+intY   = integrarS(puente.fiY.^2.*puente.D.* puente.cD,puente.L);
+intFiY = integrarS(puente.fiY.^2.,puente.L);
+intZ   = integrarS(puente.fiZ.^2.*puente.B.*puente.cdl + puente.D.*puente.cD,puente.L);
+intFiZ = integrarS(puente.fiZ.^2.,puente.L);
+
 
 %Definición de amortiguamiento aerodinámico
 zetaAeY = -(viento.rho*viento.v) /(2* puente.w(1)* puente.m1) * intY / intFiY ;
@@ -46,13 +48,14 @@ puente.L   = puente.expand  ( puente.L   , div );
 
 n = length(puente.L);
 xi=0;
+cuPrueba=0
 	% Ingtegral
 	for i    = 1: n
-		Di   = puente.D(i);
+ 		Di   = puente.D(i);
 		Cdi  = puente.cD(i);
 		Cdli = puente.cdl(i);
 		L    = puente.L(i);
-		xi   = xi + L ;
+		xi   = xi  + L ;
 		fiYi = puente.fiY(i);
         fiZi = puente.fiZ(i);
 		xj   = 0;
@@ -68,13 +71,17 @@ xi=0;
             %Co-espectro
             coU = exp (- cuY* ( viento.w*Dx ) /(2 * pi * viento.v));
             coW = exp (- cwY* ( viento.w*Dx ) /(2 * pi * viento.v));
+			cuPrueba=[cuPrueba coU];
 			%j
 			%jy2= puente.fiY .* puente.fiY .* ( (((2* puente.Iu )/ puente.B) ^2 .* puente.D .* puente.cD .* puente.D .* puente.cD) .* coU.* sNu + ( puente.cL * puente.Iv ) ^2 .* coW.* sNw ) .* puente.L * puente.L ;
             jY = jY + fiYi * fiYj .* ( (((2* puente.Iu )/ puente.B) ^2* Di * Cdi * Dj * Cdj ) .* coU.* sNu + ( puente.cL * puente.Iv ) ^2 .* coW.* sNw ) * L * L ;
 			jZ = jZ + fiZi * fiZj .* ( (2* puente.cL* puente.Iu) ^2 .* coU.* sNu + (( puente.Iv^2*( Cdli +( Di * Cdi )/puente.B) *(Cdlj +( Dj * Cdj )/ puente.B)) .*coW.* sNw )) * L * L ;
 		end
+		x=cumsum(puente.L)-xi;
+		cuPrueba2= @(w)exp (- cuY.* ( w.*x ) ./(2* pi * viento.v));
+        %jY =@(w)@(z)integrarS fiYi * fiYj .* ( (((2* puente.Iu )/ puente.B) ^2* Di * Cdi * Dj * Cdj ) .* coU.* sNu + ( puente.cL * puente.Iv ) ^2 .* coW.* sNw ) * L * L ;
     end
-
+e = cputime-tiempo
 % Normalización de la función de aceptancia
 jNormY = jY /( [puente.intFi1] ) ^2;
 jNormZ = jZ /( [puente.intFi2] ) ^2;
@@ -125,3 +132,4 @@ plot (t , rz )
 grid
 xlabel ( 'T [s] ')
 ylabel ( ' r_z [m] ')
+e = cputime-tiempo

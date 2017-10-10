@@ -16,14 +16,14 @@ end
 function int=integralLocal(fx,Dx)
     int=0;
 	if length(fx)==3
-		h1=Dx(2)-Dx(1);
-		h2=Dx(3)-Dx(2);
+		h1=Dx(1);
+		h2=Dx(2);
 		y0=fx(1);
 		y1=fx(2);
 		y2=fx(3);
 		int=(h1+h2)/(6*h1*h2)*(h2^2*(y1-y0)+h1^2*(y1-y2)+2*h1*h2*(y0+y1+y2));
     elseif length(fx)==2
-		h=Dx(2)-Dx(1);
+		h=Dx(1);
 		y0=fx(1);
 		y1=fx(2);
 		int=(y0+y1)*h/2;
