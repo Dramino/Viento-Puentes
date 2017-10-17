@@ -15,7 +15,7 @@ classdef Viento
     end
     
     methods
-        function [sNu,sNw,sNu2,sNw2]=densidadEspectralKaimal(obj)
+        function [sNu,sNw]=densidadEspectralKaimal(obj)
             %Obtiene la función de densidad espectral en todo el dominio w
             %para las dos direeciones
             %Constantes de la funcion

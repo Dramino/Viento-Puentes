@@ -27,7 +27,7 @@ Hz = abs (1 - ( viento.w ./ puente.w(2) ) .^2 + 2*1i *(puente.c - zetaAeZ) *(( v
 
 
 %Funcion de densidad espectral de Kaimal
-[sNu,sNw,sNu2,sNw2] = viento.densidadEspectralKaimal;
+[sNu,sNw] = viento.densidadEspectralKaimal;
 
 %Co espectro - Constantes
 coU = zeros(1 ,length(viento.w));

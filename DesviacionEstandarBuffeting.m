@@ -6,19 +6,19 @@ CapturaDeDatos;
 puente.integrarFi;
 %Amortiguamiento aerodin谩mico
 %Definici贸n de integrales
-intSy   = 0;
+intY   = 0;
 intFiY = 0;
-intSz   = 0;
+intZ   = 0;
 intFiZ = 0;
 
-intSy   = integrarS(puente.fiY.^2.*puente.D.* puente.cD,puente.L);
+intY   = integrarS(puente.fiY.^2.*puente.D.* puente.cD,puente.L);
 intFiY = integrarS(puente.fiY.^2.,puente.L);
-intSz   = integrarS(puente.fiZ.^2.*puente.B.*puente.cdl + puente.D.*puente.cD,puente.L);
+intZ   = integrarS(puente.fiZ.^2.*puente.B.*puente.cdl + puente.D.*puente.cD,puente.L);
 intFiZ = integrarS(puente.fiZ.^2.,puente.L);
 
 %Definici贸n de amortiguamiento aerodin谩mico
-zetaAeY = -(viento.rho*viento.v) /(2* puente.w(1)* puente.m1) * intSy / intFiY ;
-zetaAeZ = -(viento.rho*viento.v) /(4* puente.w(2)* puente.m2) * intSz / intFiZ ;
+zetaAeY = -(viento.rho*viento.v) /(2* puente.w(1)* puente.m1) * intY / intFiY ;
+zetaAeZ = -(viento.rho*viento.v) /(4* puente.w(2)* puente.m2) * intZ / intFiZ ;
 
 %funci贸n de respuesta H de frecuencias
 Hy = abs (1 - ( viento.w ./ puente.w(1) ) .^2 + 2*1i *(puente.c - zetaAeY) *(( viento.w ./ puente.w(1) ))) .^( -1) ;
@@ -68,12 +68,6 @@ jNormZ = jZ /( [puente.intFi2] ) ^2;
 %D omega
 Nomega = length ( viento.w);
 Domega = ( viento.w ( Nomega ) - viento.w(1) ) /( Nomega -1) ;
-%Integral para la desviaci贸n
-%a=sum(Hy.^2.*jNormY)
-%b=sum(Hz.^2.*jNormZ)
-%Calibraci髇 con integral de trapecio de matlab
-%a2=trapz(Hy.^2.*jNormY,viento.w);
-%b2=trapz(Hz.^2.*jNormZ,viento.w);
 intSy = integrar(Hy.^2.*jNormY,Domega);
 intSz = integrar(Hz.^2.*jNormZ,Domega);
 %desviaci贸 esd谩ndar
