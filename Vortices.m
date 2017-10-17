@@ -5,10 +5,11 @@ puente.integrarFi;
 puente.integrarFiV;
 %Valor del modo al extremo del puente en direccion Z
 fiI = puente.fiZ(1) ;
-wZ=puente.w(2);
-mZ=puente.m2;
+wZ  = puente.w(2);
+mZ  = puente.m2;
 
-sRz=0.130;
+%Obtenido de la función de desviación estándar
+sRz = 0.130;
 
 %Velocidad resonante
 Vr = ( puente.dV * wZ ) /(2* pi* puente.St );

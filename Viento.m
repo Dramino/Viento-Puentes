@@ -15,7 +15,7 @@ classdef Viento
     end
     
     methods
-        function [sNu,sNw]=densidadEspectralKaimal(obj)
+        function [sNu,sNw,sNu2,sNw2]=densidadEspectralKaimal(obj)
             %Obtiene la función de densidad espectral en todo el dominio w
             %para las dos direeciones
             %Constantes de la funcion
@@ -24,14 +24,14 @@ classdef Viento
             H   = [obj.h];
             xLu = 100*(H/10)^0.3;
             xLw = xLu/12;
-            v   = [obj.v];
+            V   = [obj.v];
             %Definicion de variables
             w   = [obj.w];
             sNu = zeros(1,length(w));
             sNw = zeros(1,length(w));
             %Función de densidad espectral
-            sNu = Au*xLu./(v *(1+1.5* Au.*w*(xLu/v )).^(5/3) );
-            sNw = Aw*xLw./(v *(1+1.5* Aw.*w*(xLw/v )).^(5/3) );
+			sNu=Au.*xLu./(V *(1+1.5* Au.*w*(xLu/V )).^(5/3) );
+            sNw=Aw.*xLw./(V *(1+1.5* Aw.*w*(xLw/V )).^(5/3) );
         end
     end
     

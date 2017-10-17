@@ -3,6 +3,7 @@ close all
 CapturaDeDatos;
 puente.integrarFi;
 puente.integrarFiV;
+
 %Valor del modo al extremo del puente en direccion Z
 fiI = puente.fiZ(1) ;
 wZ  = puente.w(2);
@@ -11,7 +12,7 @@ mZ  = puente.m2;
 %Integral
 fiX    = [datos(1:13,8); datos(33:43,8)];
 fiZ    = [datos(1:13,7); datos(33:43,7)];
-intVor = sum(( fiX.^2 + fiZ.^2) .* puente.Lv);
+intVor = integrarS(( fiX.^2 + fiZ.^2),puente.Lv);
 
 %Velocidad resonante
 Vr   = (puente.dV * wZ ) /(2* pi* puente.St );

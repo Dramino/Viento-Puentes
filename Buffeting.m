@@ -1,3 +1,4 @@
+%Obtiene la respuesta en el tiempo de desplazamiento ante efecto de ráfagas
 clear all
 close all
 tiempo = cputime;
@@ -26,7 +27,7 @@ Hz = abs (1 - ( viento.w ./ puente.w(2) ) .^2 + 2*1i *(puente.c - zetaAeZ) *(( v
 
 
 %Funcion de densidad espectral de Kaimal
-[sNu,sNw] = viento.densidadEspectralKaimal;
+[sNu,sNw,sNu2,sNw2] = viento.densidadEspectralKaimal;
 
 %Co espectro - Constantes
 coU = zeros(1 ,length(viento.w));
@@ -47,41 +48,21 @@ puente.fiZ = puente.prolong ( puente.fiZ , div );
 puente.L   = puente.expand  ( puente.L   , div );
 
 n = length(puente.L);
-xi=0;
-cuPrueba=0
-	% Ingtegral
-	for i    = 1: n
- 		Di   = puente.D(i);
-		Cdi  = puente.cD(i);
-		Cdli = puente.cdl(i);
-		L    = puente.L(i);
-		xi   = xi  + L ;
-		fiYi = puente.fiY(i);
-        fiZi = puente.fiZ(i);
-		xj   = 0;
-		for j = 1: n
-			Dj   = puente.D(j);
-			Cdj  = puente.cD(j);
-			Cdlj = puente.cdl(j);
-			L    = puente.L(j);
-			xj   = xj + L ;
-			fiYj = puente.fiY(j);
-            fiZj = puente.fiZ(j);
-			Dx   = abs (xi - xj );
-            %Co-espectro
-            coU = exp (- cuY* ( viento.w*Dx ) /(2 * pi * viento.v));
-            coW = exp (- cwY* ( viento.w*Dx ) /(2 * pi * viento.v));
-			cuPrueba=[cuPrueba coU];
-			%j
-			%jy2= puente.fiY .* puente.fiY .* ( (((2* puente.Iu )/ puente.B) ^2 .* puente.D .* puente.cD .* puente.D .* puente.cD) .* coU.* sNu + ( puente.cL * puente.Iv ) ^2 .* coW.* sNw ) .* puente.L * puente.L ;
-            jY = jY + fiYi * fiYj .* ( (((2* puente.Iu )/ puente.B) ^2* Di * Cdi * Dj * Cdj ) .* coU.* sNu + ( puente.cL * puente.Iv ) ^2 .* coW.* sNw ) * L * L ;
-			jZ = jZ + fiZi * fiZj .* ( (2* puente.cL* puente.Iu) ^2 .* coU.* sNu + (( puente.Iv^2*( Cdli +( Di * Cdi )/puente.B) *(Cdlj +( Dj * Cdj )/ puente.B)) .*coW.* sNw )) * L * L ;
-		end
-		x=cumsum(puente.L)-xi;
-		cuPrueba2= @(w)exp (- cuY.* ( w.*x ) ./(2* pi * viento.v));
-        %jY =@(w)@(z)integrarS fiYi * fiYj .* ( (((2* puente.Iu )/ puente.B) ^2* Di * Cdi * Dj * Cdj ) .* coU.* sNu + ( puente.cL * puente.Iv ) ^2 .* coW.* sNw ) * L * L ;
-    end
-e = cputime-tiempo
+x=cumsum(puente.L);
+jY=0;
+jZ=0;
+%http://www.mathworks.com/help/matlab/ref/trapz.html
+% función de acepantcia conjunta
+for i=1:n
+	for j=1:n
+        Dx=abs(x(i)-x(j));
+        coU = exp (- cuY* ( viento.w*Dx ) /(2 * pi * viento.v));
+        coW = exp (- cwY* ( viento.w*Dx ) /(2 * pi * viento.v));
+		jY  = jY + puente.fiY(i) * puente.fiY(j) .* ( (((2* puente.Iu )/ puente.B) ^2* puente.D(i) * puente.cD(i) * puente.D(j) * puente.cD(j) ) .* coU.* sNu + ( puente.cL * puente.Iv ) ^2 .* coW.* sNw ) * puente.L(i) * puente.L(j) ;
+        jZ  = jZ + puente.fiZ(i) * puente.fiZ(j) .* ( (2* puente.cL* puente.Iu) ^2 .* coU.* sNu + (( puente.Iv^2*( puente.cdl(i) +( puente.D(i) * puente.cD(i) )/puente.B) *(puente.cdl(j) +( puente.D(j) * puente.cD(j) )/ puente.B)) .*coW.* sNw )) * puente.L(i) * puente.L(j) ;
+	end
+end
+
 % Normalización de la función de aceptancia
 jNormY = jY /( [puente.intFi1] ) ^2;
 jNormZ = jZ /( [puente.intFi2] ) ^2;
@@ -101,21 +82,17 @@ dw = ( viento.w( Nw ) - viento.w(1)) / Nw ;
 t   = linspace (0 ,600 ,600) ;
 ry  = zeros ( 1 , length(t) );
 rz  = zeros ( 1 , length(t) );
-sRy = 0.139;
-sRz = 0.076;
-%Matriz de valores aleatorios
-%fiAl= linspace (1 ,1 ,length(viento.w)) ;
-%fiAl=map(fiAl,sin);
-%función anonima de valores al azar de 0 a d pi
-%crearAleatorio=@(x)x*rand(1)*2*pi;
-%aleatorio=arrayfun(crearAleatorio,linspace (1 ,1 ,600) );
+%obtenidos de la función de desviación estándar
+sRy = 0.1369;
+sRz = 0.0539;
+
 for i = 1: Nw
 	ry = ry+ sqrt(2* espResY(i)* dw ) .* cos ( viento.w(i)*t - rand (1) *2* pi);
 	rz = rz+ sqrt(2* espResZ(i)* dw ) .* cos ( viento.w(i)*t - rand (1) *2* pi);
 end
 
 %Factor pico
-maxY = max ( abs (ry ) );
+maxY = max(abs(ry));
 maxZ = max(abs(rz));
 kpx  = maxY / sRy
 kpZ  = maxZ / sRz
@@ -132,4 +109,4 @@ plot (t , rz )
 grid
 xlabel ( 'T [s] ')
 ylabel ( ' r_z [m] ')
-e = cputime-tiempo
+e = cputime-tiempo;
